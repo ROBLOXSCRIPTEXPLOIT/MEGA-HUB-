@@ -1,0 +1,72 @@
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+local Window = OrionLib:MakeWindow({
+    Name = "KEY SYSTEM",
+    HidePremium = false,
+    IntroText = "MEGA HUB",
+    SaveConfig = true,
+    ConfigFolder = "KEY SYSTEM"
+})
+
+-- Tabs
+local MainTab = Window:MakeTab({
+    Name = "KEY SYSTEM",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Sections
+local KeySection = MainTab:AddSection({
+    Name = "Key System"
+})
+
+local OutputLabel = KeySection:AddLabel("Status: Waiting for key...")
+
+KeySection:AddTextbox({
+    Name = "Enter Key",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        _G.Key = value
+    end    
+})
+
+KeySection:AddButton({
+    Name = "Copy Key Link",
+    Callback = function()
+        setclipboard("https://workink.net/1VtY/lymspwze")
+    end    
+})
+
+local function CheckKey()
+    if not _G.Key or _G.Key == "" then
+        OutputLabel:Set("Status: Please enter a key")
+        return
+    end
+
+    local keyResponse = game:HttpGet("https://redirect-api.work.ink/tokenValid/" .. _G.Key .. "?linkId=96825")
+    if keyResponse == 'False' then
+        OutputLabel:Set("Status: KEY INVALID")
+        return
+    end
+
+    local script, err = loadstring(game:HttpGet("https://raw.githubusercontent.com/mikmikuser/MEGA-HUB/master/MEGA%20HUB"))
+    if script then
+        OutputLabel:Set("Status: Key valid, loading script...")
+        local success, executionErr = pcall(script)
+        if not success then
+            OutputLabel:Set("Status: Failed to execute script - " .. (executionErr or "unknown error"))
+        end
+    else
+        OutputLabel:Set("Status: Failed to load script - " .. (err or "unknown error"))
+    end
+end
+
+-- Button to validate the key
+KeySection:AddButton({
+    Name = "Check Key",
+    Callback = function()
+        CheckKey()
+    end    
+})
+
+OrionLib:Init()
