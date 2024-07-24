@@ -1,0 +1,93 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "MEGA HUB V1-Blox fruit", HidePremium = false, IntroText = "MEGA HUB", SaveConfig = true, ConfigFolder = "MEGA HUBV1"})
+
+OrionLib:MakeNotification({
+    Name = "THANK FOR USING MY SCRIPT",
+    Content = "GAME SUPPORTED!!!",
+    Image = "rbxassetid://4483345998",
+    Time = 10
+})
+
+OrionLib:MakeNotification({
+    Name = "COPIED!!!",
+    Content = "https://discord.com/invite/eejZ9Hh8SJ",
+    Image = "rbxassetid://4483345998",
+    Time = 10
+})
+
+setclipboard("https://discord.com/invite/eejZ9Hh8SJ")
+
+local MainTab = Window:MakeTab({
+    Name = "MAIN",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = MainTab:AddSection({
+    Name = "☪Main☪"
+})
+
+MainTab:AddButton({
+        Name = "MATSUNE HUB V3",
+        Callback = function()
+              loadstring(game:HttpGet("https://raw.githubusercontent.com/Yatsuraa/Matsune/main/MatsuneV3.lua"))()
+          end    
+})
+
+MainTab:AddButton({
+        Name = "HOHO HUB",
+        Callback = function()
+              loadstring(game:HttpGet('https://raw.githubusercontent.com/acsu123/HohoV2/Free/BloxFruitFreeV3.lua'))()
+          end    
+})
+
+MainTab:AddButton({
+        Name = "FAI FAO V2",
+        Callback = function()
+              loadstring(game:HttpGet"https://raw.githubusercontent.com/PNguyen0199/Script/main/Fai-Fao-Ver2.lua")()
+          end    
+})
+
+MainTab:AddButton({
+        Name = "REDz HUB",
+        Callback = function()
+              loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/BloxFruits/main/redz9999"))()
+          end    
+})
+
+MainTab:AddButton({
+        Name = "RIN HUB",
+        Callback = function()
+              loadstring(game:HttpGet("https://raw.githubusercontent.com/RinHubb/RinHub/main/RinXFruitFinder"))()
+          end    
+})
+
+MainTab:AddLabel("⚠️WARNING⚠️")
+
+local MiscTab = Window:MakeTab({
+    Name = "☸Misc☸",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = MiscTab:AddSection({
+    Name = "Misc"
+})
+
+MiscTab:AddLabel("Credits to Mik_player123")
+
+MiscTab:AddButton({
+        Name = "Join our Discord",
+        Callback = function()
+                setclipboard("https://discord.com/invite/eejZ9Hh8SJ")
+        end
+})
+
+MiscTab:AddButton({
+        Name = "YOUTUBE Mik_player",
+        Callback = function()
+                setclipboard("https://www.youtube.com/@Scripter360")
+        end
+})
+
+OrionLib:Init()
