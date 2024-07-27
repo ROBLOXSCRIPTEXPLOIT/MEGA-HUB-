@@ -1,0 +1,391 @@
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source'))()
+local Window = OrionLib:MakeWindow({
+    Name = "MEGA HUB-MURDER MYSTERY", 
+    HidePremium = false, 
+    IntroText = "MEGA HUB", 
+    SaveConfig = true, 
+    ConfigFolder = "MEGA HUB MM2"
+})
+
+OrionLib:MakeNotification({
+    Name = "HI!",
+    Content = "THANK YOU FOR EXECUTING MY SCRIPT",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+OrionLib:MakeNotification({
+    Name = "COPIED!",
+    Content = "Clipboard text has been copied",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+setclipboard("Your text here")
+
+local EspTab = Window:MakeTab({
+    Name = "MAIN",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+EspTab:AddSection({
+    Name = "MAIN"
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local ESPEnabled = false
+local roles = {}
+local infjumpenabled = false
+local Murder, Sheriff, Hero
+
+function CreateHighlight()
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and not v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = Instance.new("Highlight", v.Character)
+            highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Default color
+        end
+    end
+end
+
+function UpdateHighlights()
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = v.Character:FindFirstChildOfClass("Highlight")
+            if v.Name == Murder and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for Murderer
+            elseif v.Name == Sheriff and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(0, 0, 255) -- Blue for Sheriff
+            elseif v.Name == Hero and IsAlive(v) and not IsAlive(game.Players[Sheriff]) then
+                highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow for Hero
+            else
+                highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green for others
+            end
+        end
+    end
+end    
+
+function IsAlive(player)
+    local playerData = roles[player.Name]
+    return playerData and not playerData.Killed and not playerData.Dead
+end
+
+function StartESP()
+    ESPEnabled = true
+    CreateHighlight()
+    RunService.RenderStepped:Connect(function()
+        if ESPEnabled then
+            roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+            for i, v in pairs(roles) do
+                if v.Role == "Murderer" then
+                    Murder = i
+                elseif v.Role == 'Sheriff' then
+                    Sheriff = i
+                elseif v.Role == 'Hero' then
+                    Hero = i
+                end
+            end
+            UpdateHighlights()
+        end
+    end)
+end
+
+function StopESP()
+    ESPEnabled = false
+    for _, v in pairs(Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            v.Character:FindFirstChildOfClass("Highlight"):Destroy()
+        end
+    end
+end
+
+EspTab:AddToggle({
+    Name = "PLAYER ESP",
+    Default = false,
+    Callback = function(value)
+        if value then
+            StartESP()
+        else
+            StopESP()
+        end
+    end
+})
+
+EspTab:AddTextbox({
+    Name = "Hitbox",
+    TextDisappear = true,
+    Callback = function(Value)
+        _G.HeadSize = tonumber(Value) or 2
+        _G.Disabled = false
+
+        RunService.RenderStepped:Connect(function()
+            if not _G.Disabled then
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player.Name ~= LP.Name then
+                        pcall(function()
+                            local character = player.Character
+                            local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+                            if humanoidRootPart then
+                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                humanoidRootPart.Transparency = 0.7
+                                humanoidRootPart.BrickColor = BrickColor.new("Bright red")
+                                humanoidRootPart.Material = Enum.Material.Neon
+                                humanoidRootPart.CanCollide = false
+                            end
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+})
+
+local PlayerTab = Window:MakeTab({
+    Name = "PLAYER",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+PlayerTab:AddSlider({
+    Name = "Walkspeed",
+    Min = 16,
+    Max = 500,
+    Default = 16,
+    Color = Color3.fromRGB(0,255,0),
+    Increment = 1,
+    ValueName = "WS",
+    Callback = function(Value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = Value
+        end
+    end    
+})
+
+PlayerTab:AddSlider({
+    Name = "Jumppower",
+    Min = 50,
+    Max = 500,
+    Default = 50,
+    Color = Color3.fromRGB(0,255,0),
+    Increment = 1,
+    ValueName = "JP",
+    Callback = function(Value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.JumpPower = Value
+        end
+    end    
+})
+
+PlayerTab:AddToggle({
+    Name = "INFINITE JUMP",
+    Default = false,
+    Callback = function(value)
+        infjumpenabled = value
+        if infjumpenabled then
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Enabled",
+                Content = "INFINITE JUMP ENABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Disabled",
+                Content = "INFINITE JUMP DISABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
+})
+
+-- Infinite Jump Functionality
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if infjumpenabled then
+        local humanoid = LP.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid:ChangeState("Jumping")
+        end
+    end
+end)
+
+local TeleportTab = Window:MakeTab({
+    Name = "TELEPORT",
+    Icon = "rbxassetid://4483345998",
+})
+
+TeleportTab:AddSection({
+    Name = "PLACE"
+})
+
+TeleportTab:AddTextbox({
+    Name = "TELEPORT TO PLAYER",
+    Default = "PlayerName",
+    TextDisappear = false,
+    Callback = function(Value)
+        local targetPlayer = Players:FindFirstChild(Value)
+        if targetPlayer and targetPlayer.Character and LP.Character then
+            LP.Character:SetPrimaryPartCFrame(targetPlayer.Character:GetPrimaryPartCFrame())
+        end
+    end
+})
+
+local function updatePlayerList()
+    local playerList = {}
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    return playerList
+end
+
+local selectedPlayer = nil
+TeleportTab:AddDropdown({
+    Name = "Select Player",
+    Options = updatePlayerList(),
+    Callback = function(selected)
+        selectedPlayer = game.Players:FindFirstChild(selected)
+    end
+})
+
+TeleportTab:AddButton({
+    Name = "Teleport",
+    Callback = function()
+        if selectedPlayer then
+            LP.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+            print("Teleported to " .. selectedPlayer.Name)
+        else
+            print("No player selected.")
+        end
+    end
+})
+
+RoleTab = Window:MakeTab({
+    Name = "Roles",
+    Icon = "rbxassetid://4483345998", -- You can use any asset id for the icon
+    PremiumOnly = false
+})
+
+TeleportTab:AddSection({
+    Name = "MURDER"
+})
+
+local autoKillEnabled = false
+
+function EquipKnife()
+    local tool = LP.Backpack:FindFirstChild("Knife") -- Change "Knife" to the actual name of the knife tool
+    if tool then
+        tool.Parent = LP.Character
+    end
+end
+
+function TeleportAndKillAll()
+    if Murder then
+        for _, v in pairs(Players:GetPlayers()) do
+            if v ~= LP and v.Character and v.Character:FindFirstChildOfClass("Humanoid") then
+                LP.Character:SetPrimaryPartCFrame(v.Character.PrimaryPart.CFrame)
+                wait(0.5) -- Adjust the wait time as needed
+                v.Character.Humanoid.Health = 0
+                wait(0.5) -- Adjust the wait time between kills
+            end
+        end
+    else
+        OrionLib:MakeNotification({
+            Name = "Not a Murderer",
+            Content = "You must be a murderer to use Auto Kill.",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if ESPEnabled then
+        roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+        for i, v in pairs(roles) do
+            if v.Role == "Murderer" then
+                Murder = i
+            elseif v.Role == 'Sheriff' then
+                Sheriff = i
+            elseif v.Role == 'Hero' then
+                Hero = i
+            end
+        end
+
+        if Murder then
+            if not autoKillEnabled then
+                autoKillEnabled = true
+                EquipKnife()
+                OrionLib:MakeNotification({
+                    Name = "Auto Kill Enabled",
+                    Content = "Auto Kill All has been enabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 5
+                })
+            end
+            TeleportAndKillAll()
+        else
+            if autoKillEnabled then
+                autoKillEnabled = false
+                OrionLib:MakeNotification({
+                    Name = "Auto Kill Disabled",
+                    Content = "You are no longer a murderer. Auto Kill All has been disabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 5
+                })
+            end
+        end
+    end
+end)
+
+game.Players.PlayerAdded:Connect(function()
+    TeleportTab:UpdateDropdown("Select Player", updatePlayerList())
+end)
+
+game.Players.PlayerRemoving:Connect(function()
+    TeleportTab:UpdateDropdown("Select Player", updatePlayerList())
+end)
+
+local AutoFarmTab = Window:MakeTab({
+    Name = "AutoFarm",
+    Icon = "rbxassetid://4483345998
+})
+
+local coinFarmEnabled = false
+
+function TeleportToCoins()
+    while coinFarmEnabled do
+        local coins = workspace:FindPartsInRegion3(workspace.CurrentCamera.CFrame:ToWorldSpace(workspace.CurrentCamera.CFrame), Vector3.new(1000, 1000, 1000), nil)
+        for _, part in pairs(coins) do
+            if part.Name == "Coin" and part:IsA("BasePart") then
+                LP.Character:SetPrimaryPartCFrame(part.CFrame)
+                wait(0.5)
+                break
+            end
+        end
+        wait(1)
+    end
+end
+
+RolesTab = Window:MakeTab({
+    Name = "Roles",
+    Icon = "rbxassetid://4483345998", -- You can use any asset id for the icon
+    PremiumOnly = false
+})
+
+AutoFarmTab:AddToggle({
+    Name = "Coin Farm",
+    Default = false,
+    Callback = function(value)
+        coinFarmEnabled = value
+        if value then
+            TeleportToCoins()
+        end
+    end
+})
+
+OrionLib:Init()
