@@ -1,18 +1,32 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local Humanoid = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-local RootPart = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-local selectedPlayer
-
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source'))()
 local Window = OrionLib:MakeWindow({
-    Name = "Murder Mystery 2",
+    Name = "MEGA HUB-MURDER MYSTERY",
     HidePremium = false,
     IntroText = "MEGA HUB",
     SaveConfig = true,
-    ConfigFolder = "MM2Config"
+    ConfigFolder = "MEGA HUB MM2"
+})
+
+OrionLib:MakeNotification({
+    Name = "HI!",
+    Content = "THANK YOU FOR EXECUTING MY SCRIPT",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+OrionLib:MakeNotification({
+    Name = "COPIED!",
+    Content = "Clipboard text has been copied",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+setclipboard("Your text here")
+
+local EspTab = Window:MakeTab({
+    Name = "MAIN",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
 })
 
 local MainTab = Window:MakeTab({
@@ -21,54 +35,25 @@ local MainTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-local Section = MainTab:AddSection({
-    Name = "Client"
-})
-
-local EspTab = Window:MakeTab({
-    Name = "ESP",
+local PlayerTab = Window:MakeTab({
+    Name = "PLAYER",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
-})
-
-local EspSection = EspTab:AddSection({
-    Name = "Highlight"
 })
 
 local TpTab = Window:MakeTab({
-    Name = "Teleport",
+    Name = "TELEPORT",
     Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local TpSection = TpTab:AddSection({
-    Name = "TP to place"
-})
-
-local EmoteTab = Window:MakeTab({
-    Name = "Emotes",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local RolesTab = Window:MakeTab({
-    Name = "Roles",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local RolesSection = RolesTab:AddSection({
-    Name = "Role"
 })
 
 local AutoFarmTab = Window:MakeTab({
     Name = "AutoFarm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
+    Icon = "rbxassetid://4483345998"
 })
 
-local AutoFarmSection = AutoFarmTab:AddSection({
-    Name = "Coins"
+local RolesTab = Window:MakeTab({
+    Name = "Role",
+    Icon = "rbxassetid://4483345998"
 })
 
 MainTab:AddToggle({
@@ -78,6 +63,8 @@ MainTab:AddToggle({
         getgenv().ClickTP = state
     end
 })
+
+MainTab:AddSection({ Name = "Main" })
 
 MainTab:AddSlider({
     Name = "WalkSpeed",
@@ -171,6 +158,141 @@ MainTab:AddButton({
     end
 })
 
+-- Services
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local LP = Players.LocalPlayer
+
+-- Variables
+local ESPEnabled = false
+local infjumpenabled = false
+local Murder, Sheriff, Hero
+local roles = {}
+local selectedPlayer = nil
+local coinFarmEnabled = false
+
+-- Functions
+local function CreateHighlight()
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and not v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = Instance.new("Highlight", v.Character)
+            highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Default color
+        end
+    end
+end
+
+local function UpdateHighlights()
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = v.Character:FindFirstChildOfClass("Highlight")
+            if v.Name == Murder and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for Murderer
+            elseif v.Name == Sheriff and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(0, 0, 255) -- Blue for Sheriff
+            elseif v.Name == Hero and IsAlive(v) and not IsAlive(game.Players[Sheriff]) then
+                highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow for Hero
+            else
+                highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green for others
+            end
+        end
+    end
+end    
+
+local function IsAlive(player)
+    local playerData = roles[player.Name]
+    return playerData and not playerData.Killed and not playerData.Dead
+end
+
+local function StartESP()
+    ESPEnabled = true
+    CreateHighlight()
+    RunService.RenderStepped:Connect(function()
+        if ESPEnabled then
+            roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+            for i, v in pairs(roles) do
+                if v.Role == "Murderer" then
+                    Murder = i
+                elseif v.Role == 'Sheriff' then
+                    Sheriff = i
+                elseif v.Role == 'Hero' then
+                    Hero = i
+                end
+            end
+            UpdateHighlights()
+        end
+    end)
+end
+
+local function StopESP()
+    ESPEnabled = false
+    for _, v in pairs(Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            v.Character:FindFirstChildOfClass("Highlight"):Destroy()
+        end
+    end
+end
+
+local function TeleportToCoins()
+    while coinFarmEnabled do
+        local coins = Workspace:FindPartsInRegion3(workspace.CurrentCamera.CFrame:ToWorldSpace(workspace.CurrentCamera.CFrame), Vector3.new(1000, 1000, 1000), nil)
+        for _, part in pairs(coins) do
+            if part.Name == "Coin" and part:IsA("BasePart") then
+                LP.Character:SetPrimaryPartCFrame(part.CFrame)
+                wait(0.5)
+                break
+            end
+        end
+        wait(1)
+    end
+end
+
+-- Tab Functions
+EspTab:AddSection({ Name = "MAIN" })
+
+EspTab:AddToggle({
+    Name = "PLAYER ESP",
+    Default = false,
+    Callback = function(value)
+        if value then
+            StartESP()
+        else
+            StopESP()
+        end
+    end
+})
+
+EspTab:AddTextbox({
+    Name = "Hitbox",
+    TextDisappear = true,
+    Callback = function(Value)
+        _G.HeadSize = tonumber(Value) or 2
+        _G.Disabled = false
+
+        RunService.RenderStepped:Connect(function()
+            if not _G.Disabled then
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player.Name ~= LP.Name then
+                        pcall(function()
+                            local character = player.Character
+                            local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+                            if humanoidRootPart then
+                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                humanoidRootPart.Transparency = 0.7
+                                humanoidRootPart.BrickColor = BrickColor.new("Bright red")
+                                humanoidRootPart.Material = Enum.Material.Neon
+                                humanoidRootPart.CanCollide = false
+                            end
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+})
+
 EspTab:AddToggle({
     Name = "Player ESP",
     Default = false,
@@ -233,10 +355,109 @@ EspTab:AddToggle({
     end
 })
 
-EspTab:AddButton({
-    Name = "Unlock Workspace",
+PlayerTab:AddSlider({
+    Name = "Walkspeed",
+    Min = 16,
+    Max = 500,
+    Default = 16,
+    Color = Color3.fromRGB(0, 255, 0),
+    Increment = 1,
+    ValueName = "WS",
+    Callback = function(Value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = Value
+        end
+    end    
+})
+
+PlayerTab:AddSlider({
+    Name = "Jumppower",
+    Min = 50,
+    Max = 500,
+    Default = 50,
+    Color = Color3.fromRGB(0, 255, 0),
+    Increment = 1,
+    ValueName = "JP",
+    Callback = function(Value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.JumpPower = Value
+        end
+    end    
+})
+
+PlayerTab:AddToggle({
+    Name = "INFINITE JUMP",
+    Default = false,
+    Callback = function(value)
+        infjumpenabled = value
+        if infjumpenabled then
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Enabled",
+                Content = "INFINITE JUMP ENABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Disabled",
+                Content = "INFINITE JUMP DISABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
+})
+
+UserInputService.JumpRequest:Connect(function()
+    if infjumpenabled then
+        local humanoid = LP.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid:ChangeState("Jumping")
+        end
+    end
+end)
+
+TpTab:AddSection({ Name = "PLACE" })
+
+TpTab:AddTextbox({
+    Name = "TELEPORT TO PLAYER",
+    Default = "PlayerName",
+    TextDisappear = false,
+    Callback = function(Value)
+        local targetPlayer = Players:FindFirstChild(Value)
+        if targetPlayer and targetPlayer.Character and LP.Character then
+            LP.Character:SetPrimaryPartCFrame(targetPlayer.Character:GetPrimaryPartCFrame())
+        end
+    end
+})
+
+local function updatePlayerList()
+    local playerList = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    return playerList
+end
+
+TpTab:AddDropdown({
+    Name = "Select Player",
+    Options = updatePlayerList(),
+    Callback = function(selected)
+        selectedPlayer = Players:FindFirstChild(selected)
+    end
+})
+
+TpTab:AddButton({
+    Name = "Teleport",
     Callback = function()
-        unlock(Workspace)
+        if selectedPlayer then
+            LP.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+            print("Teleported to " .. selectedPlayer.Name)
+        else
+            print("No player selected.")
+        end
     end
 })
 
@@ -244,7 +465,7 @@ local TeleportTable = {"Lobby", "Map"}
 local TeleportDict = {
     Lobby = Vector3.new(0, 0, 0),
     Map = Vector3.new(100, 100, 100)
-}
+})
 
 TpTab:AddDropdown({
     Name = "Teleports",
@@ -320,6 +541,8 @@ TpSection:AddButton({
     end
 })
 
+AutoFarmTab:AddSection({ Name = "Coins" })
+
 AutoFarmTab:AddToggle({
     Name = "Autofarm",
     Default = false,
@@ -361,6 +584,8 @@ AutoFarmTab:AddDropdown({
         getgenv().AutofarmMethod = val
     end
 })
+
+RolesTab:AddSection({ Name = "SHERIFF" })
 
 RolesTab:AddToggle({
     Name = "Silent Aim",
