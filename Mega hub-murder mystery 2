@@ -22,7 +22,7 @@ local MainTab = Window:MakeTab({
 })
 
 local Section = MainTab:AddSection({
-        Name = "Client"
+    Name = "Client"
 })
 
 local EspTab = Window:MakeTab({
@@ -31,8 +31,9 @@ local EspTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-local Section = EspTab:AddSection({
-        Name = "highlight"
+local EspSection = EspTab:AddSection({
+    Name = "Highlight"
+})
 
 local TpTab = Window:MakeTab({
     Name = "Teleport",
@@ -40,24 +41,24 @@ local TpTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-local Section = TpTab:AddSection({
-        Name = "tp to place"
+local TpSection = TpTab:AddSection({
+    Name = "TP to place"
 })
 
 local EmoteTab = Window:MakeTab({
-    Name = "Main",
+    Name = "Emotes",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
 local RolesTab = Window:MakeTab({
-    Name = "ROLES",
+    Name = "Roles",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
-local Section = RolesTab:AddSection({
-        Name = "role"
+local RolesSection = RolesTab:AddSection({
+    Name = "Role"
 })
 
 local AutoFarmTab = Window:MakeTab({
@@ -66,8 +67,8 @@ local AutoFarmTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-local Section = AutofarmTab:AddSection({
-        Name = "coins"
+local AutoFarmSection = AutoFarmTab:AddSection({
+    Name = "Coins"
 })
 
 MainTab:AddToggle({
@@ -91,7 +92,7 @@ MainTab:AddSlider({
         if Humanoid then
             Humanoid.WalkSpeed = value
         end
-    end    
+    end
 })
 
 MainTab:AddSlider({
@@ -107,7 +108,7 @@ MainTab:AddSlider({
         if Humanoid then
             Humanoid.JumpPower = value
         end
-    end    
+    end
 })
 
 MainTab:AddToggle({
@@ -133,7 +134,7 @@ MainTab:AddSlider({
     ValueName = "FlySpeed",
     Callback = function(value)
         getgenv().FlySpeed = tonumber(value)
-    end    
+    end
 })
 
 MainTab:AddButton({
@@ -272,7 +273,7 @@ local function updatePlayerList()
     return playerList
 end
 
-local playerDropdown = WorldSection:AddDropdown({
+local playerDropdown = TpSection:AddDropdown({
     Name = "Select Player",
     Options = updatePlayerList(),
     Callback = function(selected)
@@ -288,7 +289,7 @@ Players.PlayerRemoving:Connect(function()
     refreshDropdown(playerDropdown)
 end)
 
-Tptab:AddButton({
+TpSection:AddButton({
     Name = "Kill Player",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("Humanoid") then
@@ -300,7 +301,7 @@ Tptab:AddButton({
     end
 })
 
-Tptab:AddButton({
+TpSection:AddButton({
     Name = "Fling",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -319,7 +320,7 @@ Tptab:AddButton({
     end
 })
 
-AutofarmTab:AddToggle({
+AutoFarmTab:AddToggle({
     Name = "Autofarm",
     Default = false,
     Callback = function(state)
@@ -352,7 +353,7 @@ AutofarmTab:AddToggle({
     end
 })
 
-AutofarmTab:AddDropdown({
+AutoFarmTab:AddDropdown({
     Name = "Autofarm Method",
     Default = "XP",
     Options = {"XP", "Coins"},
@@ -379,7 +380,7 @@ RolesTab:AddSlider({
     ValueName = "Accuracy",
     Callback = function(value)
         getgenv().GunAccuracy = tonumber(value) or 25
-    end    
+    end
 })
 
 RolesTab:AddToggle({
