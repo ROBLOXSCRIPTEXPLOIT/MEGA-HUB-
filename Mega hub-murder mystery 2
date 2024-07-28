@@ -1,3 +1,4 @@
+-- Load OrionLib
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source'))()
 local Window = OrionLib:MakeWindow({
     Name = "MEGA HUB-MURDER MYSTERY",
@@ -7,6 +8,7 @@ local Window = OrionLib:MakeWindow({
     ConfigFolder = "MEGA HUB MM2"
 })
 
+-- Notifications
 OrionLib:MakeNotification({
     Name = "HI!",
     Content = "THANK YOU FOR EXECUTING MY SCRIPT",
@@ -23,140 +25,13 @@ OrionLib:MakeNotification({
 
 setclipboard("Your text here")
 
-local EspTab = Window:MakeTab({
-    Name = "MAIN",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local MainTab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local PlayerTab = Window:MakeTab({
-    Name = "PLAYER",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local TpTab = Window:MakeTab({
-    Name = "TELEPORT",
-    Icon = "rbxassetid://4483345998",
-})
-
-local AutoFarmTab = Window:MakeTab({
-    Name = "AutoFarm",
-    Icon = "rbxassetid://4483345998"
-})
-
-local RolesTab = Window:MakeTab({
-    Name = "Role",
-    Icon = "rbxassetid://4483345998"
-})
-
-MainTab:AddToggle({
-    Name = "CTRL click tp",
-    Default = false,
-    Callback = function(state)
-        getgenv().ClickTP = state
-    end
-})
-
-MainTab:AddSection({ Name = "Main" })
-
-MainTab:AddSlider({
-    Name = "WalkSpeed",
-    Min = 16,
-    Max = 200,
-    Default = 16,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "WalkSpeed",
-    Callback = function(value)
-        getgenv().WS = tonumber(value)
-        if Humanoid then
-            Humanoid.WalkSpeed = value
-        end
-    end
-})
-
-MainTab:AddSlider({
-    Name = "JumpPower",
-    Min = 50,
-    Max = 200,
-    Default = 50,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "JumpPower",
-    Callback = function(value)
-        getgenv().JP = tonumber(value)
-        if Humanoid then
-            Humanoid.JumpPower = value
-        end
-    end
-})
-
-MainTab:AddToggle({
-    Name = "Fly",
-    Default = false,
-    Callback = function(state)
-        getgenv().Flying = state
-        if getgenv().Flying then
-            StartFly()
-        else
-            EndFly()
-        end
-    end
-})
-
-MainTab:AddSlider({
-    Name = "Fly Speed",
-    Min = 20,
-    Max = 150,
-    Default = 50,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "FlySpeed",
-    Callback = function(value)
-        getgenv().FlySpeed = tonumber(value)
-    end
-})
-
-MainTab:AddButton({
-    Name = "Btools",
-    Callback = function()
-        if not LP.Backpack:FindFirstChildOfClass("HopperBin") then
-            for _, toolType in pairs({"Clone", "GameTool", "Hammer", "Script", "Grab"}) do
-                local tool = Instance.new("HopperBin", LP.Backpack)
-                tool.BinType = toolType
-            end
-        end
-    end
-})
-
-MainTab:AddButton({
-    Name = "Godmode",
-    Callback = function()
-        GodMode()
-    end
-})
-
-MainTab:AddButton({
-    Name = "Force Respawn",
-    Callback = function()
-        LP.Character:BreakJoints()
-        Humanoid.BreakJointsOnDeath = false
-    end
-})
-
-MainTab:AddButton({
-    Name = "Get All Emotes",
-    Callback = function()
-        require(EmoteModule).GeneratePage(EmoteList, Emotes, 'Free Emotes')
-    end
-})
+-- Tabs
+local EspTab = Window:MakeTab({ Name = "MAIN", Icon = "rbxassetid://4483345998" })
+local MainTab = Window:MakeTab({ Name = "Main", Icon = "rbxassetid://4483345998" })
+local PlayerTab = Window:MakeTab({ Name = "PLAYER", Icon = "rbxassetid://4483345998" })
+local TpTab = Window:MakeTab({ Name = "TELEPORT", Icon = "rbxassetid://4483345998" })
+local AutoFarmTab = Window:MakeTab({ Name = "AutoFarm", Icon = "rbxassetid://4483345998" })
+local RolesTab = Window:MakeTab({ Name = "Role", Icon = "rbxassetid://4483345998" })
 
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -174,12 +49,12 @@ local roles = {}
 local selectedPlayer = nil
 local coinFarmEnabled = false
 
--- Functions
+-- Helper Functions
 local function CreateHighlight()
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LP and v.Character and not v.Character:FindFirstChildOfClass("Highlight") then
             local highlight = Instance.new("Highlight", v.Character)
-            highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Default color
+            highlight.FillColor = Color3.fromRGB(0, 255, 0)
         end
     end
 end
@@ -189,17 +64,17 @@ local function UpdateHighlights()
         if v ~= LP and v.Character and v.Character:FindFirstChildOfClass("Highlight") then
             local highlight = v.Character:FindFirstChildOfClass("Highlight")
             if v.Name == Murder and IsAlive(v) then
-                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for Murderer
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
             elseif v.Name == Sheriff and IsAlive(v) then
-                highlight.FillColor = Color3.fromRGB(0, 0, 255) -- Blue for Sheriff
-            elseif v.Name == Hero and IsAlive(v) and not IsAlive(game.Players[Sheriff]) then
-                highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow for Hero
+                highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            elseif v.Name == Hero and IsAlive(v) and not IsAlive(Players[Sheriff]) then
+                highlight.FillColor = Color3.fromRGB(255, 255, 0)
             else
-                highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green for others
+                highlight.FillColor = Color3.fromRGB(0, 255, 0)
             end
         end
     end
-end    
+end
 
 local function IsAlive(player)
     local playerData = roles[player.Name]
@@ -249,8 +124,108 @@ local function TeleportToCoins()
     end
 end
 
--- Tab Functions
-EspTab:AddSection({ Name = "MAIN" })
+-- Tabs Functionality
+MainTab:AddToggle({
+    Name = "CTRL click tp",
+    Default = false,
+    Callback = function(state)
+        getgenv().ClickTP = state
+    end
+})
+
+MainTab:AddSlider({
+    Name = "WalkSpeed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "WalkSpeed",
+    Callback = function(value)
+        getgenv().WS = tonumber(value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = value
+        end
+    end
+})
+
+MainTab:AddSlider({
+    Name = "JumpPower",
+    Min = 50,
+    Max = 200,
+    Default = 50,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "JumpPower",
+    Callback = function(value)
+        getgenv().JP = tonumber(value)
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character.Humanoid.JumpPower = value
+        end
+    end
+})
+
+MainTab:AddToggle({
+    Name = "Fly",
+    Default = false,
+    Callback = function(state)
+        getgenv().Flying = state
+        if getgenv().Flying then
+            StartFly() -- Define StartFly() function elsewhere
+        else
+            EndFly() -- Define EndFly() function elsewhere
+        end
+    end
+})
+
+MainTab:AddSlider({
+    Name = "Fly Speed",
+    Min = 20,
+    Max = 150,
+    Default = 50,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "FlySpeed",
+    Callback = function(value)
+        getgenv().FlySpeed = tonumber(value)
+    end
+})
+
+MainTab:AddButton({
+    Name = "Btools",
+    Callback = function()
+        if not LP.Backpack:FindFirstChildOfClass("HopperBin") then
+            for _, toolType in pairs({"Clone", "GameTool", "Hammer", "Script", "Grab"}) do
+                local tool = Instance.new("HopperBin", LP.Backpack)
+                tool.BinType = toolType
+            end
+        end
+    end
+})
+
+MainTab:AddButton({
+    Name = "Godmode",
+    Callback = function()
+        GodMode() -- Define GodMode() function elsewhere
+    end
+})
+
+MainTab:AddButton({
+    Name = "Force Respawn",
+    Callback = function()
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character:BreakJoints()
+            LP.Character.Humanoid.BreakJointsOnDeath = false
+        end
+    end
+})
+
+MainTab:AddButton({
+    Name = "Get All Emotes",
+    Callback = function()
+        require(EmoteModule).GeneratePage(EmoteList, Emotes, 'Free Emotes') -- Define these variables
+    end
+})
 
 EspTab:AddToggle({
     Name = "PLAYER ESP",
@@ -276,14 +251,8 @@ EspTab:AddTextbox({
                 for _, player in ipairs(Players:GetPlayers()) do
                     if player.Name ~= LP.Name then
                         pcall(function()
-                            local character = player.Character
-                            local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
-                            if humanoidRootPart then
-                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                                humanoidRootPart.Transparency = 0.7
-                                humanoidRootPart.BrickColor = BrickColor.new("Bright red")
-                                humanoidRootPart.Material = Enum.Material.Neon
-                                humanoidRootPart.CanCollide = false
+                            if player.Character and player.Character:FindFirstChild("Head") then
+                                player.Character.Head.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
                             end
                         end)
                     end
@@ -293,327 +262,56 @@ EspTab:AddTextbox({
     end
 })
 
-EspTab:AddToggle({
-    Name = "Player ESP",
+AutoFarmTab:AddToggle({
+    Name = "Coin Farm",
     Default = false,
     Callback = function(state)
-        getgenv().AllEsp = state
-        for _, v in pairs(folder:GetChildren()) do
-            if v:IsA("BillboardGui") and Players[v.Name] then
-                v.Enabled = getgenv().AllEsp
-            end
+        coinFarmEnabled = state
+        if state then
+            TeleportToCoins()
         end
     end
 })
 
-EspTab:AddToggle({
-    Name = "Murderer ESP",
-    Default = false,
-    Callback = function(state)
-        getgenv().MurderEsp = state
-        while getgenv().MurderEsp do
-            wait()
-            for _, v in pairs(folder:GetChildren()) do
-                if v:IsA("BillboardGui") and Players[v.Name] then
-                    if Players[v.Name].Character:FindFirstChild("Knife") or Players[v.Name].Backpack:FindFirstChild("Knife") then
-                        v.Enabled = getgenv().MurderEsp
-                    end
-                end
-            end
-        end
-    end
-})
-
-EspTab:AddToggle({
-    Name = "Sheriff ESP",
-    Default = false,
-    Callback = function(state)
-        getgenv().SheriffEsp = state
-        while getgenv().SheriffEsp do
-            wait()
-            for _, v in pairs(folder:GetChildren()) do
-                if v:IsA("BillboardGui") and Players[v.Name] then
-                    if Players[v.Name].Character:FindFirstChild("Gun") or Players[v.Name].Backpack:FindFirstChild("Gun") then
-                        v.Enabled = getgenv().SheriffEsp
-                    end
-                end
-            end
-        end
-    end
-})
-
-EspTab:AddToggle({
-    Name = "Xray",
-    Default = false,
-    Callback = function(state)
-        getgenv().Xray = state
-        if getgenv().Xray then
-            XrayOn(Workspace)
-        else
-            XrayOff(Workspace)
-        end
-    end
-})
-
-PlayerTab:AddSlider({
-    Name = "Walkspeed",
-    Min = 16,
-    Max = 500,
-    Default = 16,
-    Color = Color3.fromRGB(0, 255, 0),
-    Increment = 1,
-    ValueName = "WS",
-    Callback = function(Value)
-        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
-            LP.Character.Humanoid.WalkSpeed = Value
-        end
-    end    
-})
-
-PlayerTab:AddSlider({
-    Name = "Jumppower",
-    Min = 50,
-    Max = 500,
-    Default = 50,
-    Color = Color3.fromRGB(0, 255, 0),
-    Increment = 1,
-    ValueName = "JP",
-    Callback = function(Value)
-        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
-            LP.Character.Humanoid.JumpPower = Value
-        end
-    end    
-})
-
-PlayerTab:AddToggle({
-    Name = "INFINITE JUMP",
-    Default = false,
-    Callback = function(value)
-        infjumpenabled = value
-        if infjumpenabled then
-            OrionLib:MakeNotification({
-                Name = "Infinite Jump Enabled",
-                Content = "INFINITE JUMP ENABLED",
-                Image = "rbxassetid://4483345998",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Infinite Jump Disabled",
-                Content = "INFINITE JUMP DISABLED",
-                Image = "rbxassetid://4483345998",
-                Time = 5
-            })
-        end
-    end
-})
-
-UserInputService.JumpRequest:Connect(function()
-    if infjumpenabled then
-        local humanoid = LP.Character:FindFirstChild("Humanoid")
-        if humanoid then
-            humanoid:ChangeState("Jumping")
-        end
-    end
-end)
-
-TpTab:AddSection({ Name = "PLACE" })
-
-TpTab:AddTextbox({
-    Name = "TELEPORT TO PLAYER",
-    Default = "PlayerName",
-    TextDisappear = false,
-    Callback = function(Value)
-        local targetPlayer = Players:FindFirstChild(Value)
-        if targetPlayer and targetPlayer.Character and LP.Character then
-            LP.Character:SetPrimaryPartCFrame(targetPlayer.Character:GetPrimaryPartCFrame())
-        end
-    end
-})
-
-local function updatePlayerList()
-    local playerList = {}
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= Players.LocalPlayer then
-            table.insert(playerList, player.Name)
-        end
-    end
-    return playerList
-end
-
-TpTab:AddDropdown({
+PlayerTab:AddDropdown({
     Name = "Select Player",
-    Options = updatePlayerList(),
+    Options = function()
+        local players = {}
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Name ~= LP.Name then
+                table.insert(players, player.Name)
+            end
+        end
+        return players
+    end,
     Callback = function(selected)
-        selectedPlayer = Players:FindFirstChild(selected)
+        selectedPlayer = selected
     end
 })
 
 TpTab:AddButton({
-    Name = "Teleport",
+    Name = "Teleport to Player",
     Callback = function()
         if selectedPlayer then
-            LP.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
-            print("Teleported to " .. selectedPlayer.Name)
-        else
-            print("No player selected.")
-        end
-    end
-})
-
-local TeleportTable = {"Lobby", "Map"}
-local TeleportDict = {
-    Lobby = Vector3.new(0, 0, 0),
-    Map = Vector3.new(100, 100, 100)
-})
-
-TpTab:AddDropdown({
-    Name = "Teleports",
-    Default = "Lobby",
-    Options = TeleportTable,
-    Callback = function(val)
-        if val == "Map" then
-            for _, child in pairs(Workspace:GetDescendants()) do
-                if child:IsA("BasePart") and child.Name == "Coin_Server" then
-                    RootPart.CFrame = CFrame.new(child.Parent.Parent.Map:FindFirstChild("Part").Position)
-                end
-            end
-        else
-            RootPart.CFrame = CFrame.new(TeleportDict[val])
-        end
-    end
-})
-
-local function updatePlayerList()
-    local playerList = {}
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LP then
-            table.insert(playerList, player.Name)
-        end
-    end
-    return playerList
-end
-
-local playerDropdown = TpSection:AddDropdown({
-    Name = "Select Player",
-    Options = updatePlayerList(),
-    Callback = function(selected)
-        selectedPlayer = Players:FindFirstChild(selected)
-    end
-})
-
-Players.PlayerAdded:Connect(function()
-    refreshDropdown(playerDropdown)
-end)
-
-Players.PlayerRemoving:Connect(function()
-    refreshDropdown(playerDropdown)
-end)
-
-TpSection:AddButton({
-    Name = "Kill Player",
-    Callback = function()
-        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("Humanoid") then
-            selectedPlayer.Character.Humanoid.Health = 0
-            print("Killed " .. selectedPlayer.Name)
-        else
-            print("No player selected or player not available.")
-        end
-    end
-})
-
-TpSection:AddButton({
-    Name = "Fling",
-    Callback = function()
-        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local humanoidRootPart = selectedPlayer.Character.HumanoidRootPart
-            local bodyVelocity = Instance.new("BodyVelocity")
-            bodyVelocity.Velocity = Vector3.new(0, 1000, 0)
-            bodyVelocity.P = 1250
-            bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
-            bodyVelocity.Parent = humanoidRootPart
-
-            game:GetService("Debris"):AddItem(bodyVelocity, 0.1)
-            print("Flinged " .. selectedPlayer.Name)
-        else
-            print("No player selected or player not available.")
-        end
-    end
-})
-
-AutoFarmTab:AddSection({ Name = "Coins" })
-
-AutoFarmTab:AddToggle({
-    Name = "Autofarm",
-    Default = false,
-    Callback = function(state)
-        getgenv().Autofarm = state
-        if getgenv().AutofarmMethod == "Coins" then
-            while getgenv().Autofarm do
-                wait()
-                local CoinContainer = Workspace:FindFirstChild("CoinContainer", true)
-                if CoinContainer and Client.PlayerGui.MainGUI.Game.CashBag.Visible == true then
-                    local coin = CoinContainer:FindFirstChild("Coin_Server")
-                    if coin then
-                        repeat
-                            RootPart.CFrame = CFrame.new(coin.Position - Vector3.new(0, 2.5, 0)) * CFrame.Angles(0, 0, math.rad(180))
-                            RunService.Stepped:Wait()
-                        until not coin:IsDescendantOf(Workspace) or coin.Name ~= "Coin_Server"
-                        wait(1.8)
-                    end
-                else
-                    wait(1.5)
-                end
-            end
-        else
-            while getgenv().Autofarm do
-                wait()
-                if Client.PlayerGui.MainGUI.Game.CashBag.Visible == true then
-                    RootPart.CFrame = CFrame.new(TeleportDict["Lobby"])
-                end
+            local target = Players:FindFirstChild(selectedPlayer)
+            if target and target.Character and target.Character.PrimaryPart then
+                LP.Character:SetPrimaryPartCFrame(target.Character.PrimaryPart.CFrame)
             end
         end
-    end
-})
-
-AutoFarmTab:AddDropdown({
-    Name = "Autofarm Method",
-    Default = "XP",
-    Options = {"XP", "Coins"},
-    Callback = function(val)
-        getgenv().AutofarmMethod = val
-    end
-})
-
-RolesTab:AddSection({ Name = "SHERIFF" })
-
-RolesTab:AddToggle({
-    Name = "Silent Aim",
-    Default = false,
-    Callback = function(state)
-        getgenv().SheriffAim = state
-    end
-})
-
-RolesTab:AddSlider({
-    Name = "Accuracy",
-    Min = 0,
-    Max = 100,
-    Default = 25,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 1,
-    ValueName = "Accuracy",
-    Callback = function(value)
-        getgenv().GunAccuracy = tonumber(value) or 25
     end
 })
 
 RolesTab:AddToggle({
-    Name = "Gun ESP",
+    Name = "Auto Role",
     Default = false,
     Callback = function(state)
-        getgenv().GunESP = state
+        getgenv().AutoRole = state
+        if state then
+            -- Logic to auto-assign roles or handle role-based functions
+        end
     end
 })
+
+-- End of Script
 
 OrionLib:Init()
