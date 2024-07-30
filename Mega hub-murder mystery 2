@@ -1,66 +1,16 @@
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local Humanoid = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-local RootPart = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-local selectedPlayer
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, IntroText = "MEGA HUB", SaveConfig = true, ConfigFolder = "OrionTest"})
 
-local Window = OrionLib:MakeWindow({
-    Name = "Murder Mystery 2",
-    HidePremium = false,
-    IntroText = "MEGA HUB",
-    SaveConfig = true,
-    ConfigFolder = "MM2Config"
-})
-
--- Tabs and Sections
 local MainTab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
+        Name = "MAIN",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
 })
 
-local EspTab = Window:MakeTab({
-    Name = "ESP",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
+local Section = MainTab:AddSection({
+        Name = "MAIN"
 })
-
-local TpTab = Window:MakeTab({
-    Name = "Teleport",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local EmoteTab = Window:MakeTab({
-    Name = "Emotes",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local RolesTab = Window:MakeTab({
-    Name = "Roles",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local AutoFarmTab = Window:MakeTab({
-    Name = "AutoFarm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
--- Main Tab Features
-MainTab:AddToggle({
-    Name = "CTRL click tp",
-    Default = false,
-    Callback = function(state)
-        getgenv().ClickTP = state
-    end
-})
-
+        
 MainTab:AddSlider({
     Name = "WalkSpeed",
     Min = 16,
@@ -153,7 +103,16 @@ MainTab:AddButton({
     end
 })
 
--- ESP Tab Features
+local EspTab = Window:MakeTab({
+        Name = "ESP",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+        Name = "Esp"
+})
+
 EspTab:AddToggle({
     Name = "Player ESP",
     Default = false,
@@ -216,21 +175,23 @@ EspTab:AddToggle({
     end
 })
 
-EspTab:AddButton({
-    Name = "Unlock Workspace",
-    Callback = function()
-        unlock(Workspace)
-    end
+local TeleportTab = Window:MakeTab({
+        Name = "Teleport",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
 })
 
--- Teleport Tab Features
+local Section = TeleportTab:AddSection({
+        Name = "Tp to place"
+})
+
 local TeleportTable = {"Lobby", "Map"}
 local TeleportDict = {
     Lobby = Vector3.new(0, 0, 0),
     Map = Vector3.new(100, 100, 100)
 }
 
-TpTab:AddDropdown({
+TeleportTab:AddDropdown({
     Name = "Teleports",
     Default = "Lobby",
     Options = TeleportTable,
@@ -247,6 +208,16 @@ TpTab:AddDropdown({
     end
 })
 
+local TargetTab = Window:MakeTab({
+        Name = "Target",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+        Name = "Target player"
+})
+
 local function updatePlayerList()
     local playerList = {}
     for _, player in ipairs(Players:GetPlayers()) do
@@ -257,7 +228,7 @@ local function updatePlayerList()
     return playerList
 end
 
-local playerDropdown = TpSection:AddDropdown({
+local playerDropdown = TargetTab:AddDropdown({
     Name = "Select Player",
     Options = updatePlayerList(),
     Callback = function(selected)
@@ -277,7 +248,7 @@ Players.PlayerRemoving:Connect(function()
     refreshDropdown(playerDropdown)
 end)
 
-TpSection:AddButton({
+TargetTab:AddButton({
     Name = "Kill Player",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("Humanoid") then
@@ -289,7 +260,7 @@ TpSection:AddButton({
     end
 })
 
-TpSection:AddButton({
+TargetTab:AddButton({
     Name = "Fling",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -308,8 +279,17 @@ TpSection:AddButton({
     end
 })
 
--- AutoFarm Tab Features
-AutoFarmTab:AddToggle({
+local AutofarmTab = Window:MakeTab({
+        Name = "Autofarm",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+})
+
+local Section = AutofarmTab:AddSection({
+        Name = "Autofarm"
+})
+
+AutofarmTab:AddToggle({
     Name = "Autofarm",
     Default = false,
     Callback = function(state)
@@ -342,16 +322,6 @@ AutoFarmTab:AddToggle({
     end
 })
 
-AutoFarmTab:AddDropdown({
-    Name = "Autofarm Method",
-    Default = "XP",
-    Options = {"XP", "Coins"},
-    Callback = function(val)
-        getgenv().AutofarmMethod = val
-    end
-})
-
--- Roles Tab Features
 RolesTab:AddToggle({
     Name = "Silent Aim",
     Default = false,
@@ -373,6 +343,16 @@ RolesTab:AddSlider({
     end
 })
 
+local RolesTab = Window:MakeTab({
+        Name = "Sheriff",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+})
+
+local Section = RolesTab:AddSection({
+        Name = "Roles"
+})
+
 RolesTab:AddToggle({
     Name = "Gun ESP",
     Default = false,
@@ -381,7 +361,6 @@ RolesTab:AddToggle({
     end
 })
 
--- Auto-Shoot Features
 local isAutoShootEnabled = false
 local autoShootConnection
 
