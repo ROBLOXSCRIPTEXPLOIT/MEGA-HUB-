@@ -1,17 +1,49 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/thanhdat4461/OrionMoblie/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, IntroText = "MEGA HUB", SaveConfig = true, ConfigFolder = "OrionTest"})
 
-local MainTab = Window:MakeTab({
-        Name = "MAIN",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
+local Window = OrionLib:MakeWindow({
+    Name = "MEGA HUB V1-MURDER MYSTERY 2",
+    HidePremium = false,
+    IntroText = "MEGA HUB",
+    SaveConfig = true,
+    ConfigFolder = "MEGA MAIN"
 })
 
-local Section = MainTab:AddSection({
-        Name = "MAIN"
+OrionLib:MakeNotification({
+    Name = "WELCOME!",
+    Content = "THANK YOU FOR SUPPORTING MEGA HUB",
+    Image = "rbxassetid://4483345998",
+    Time = 8
 })
-        
-MainTab:AddSlider({
+
+OrionLib:MakeNotification({
+    Name = "COPIED TO CLIPBOARD!",
+    Content = "INVALID DISCORD!",
+    Image = "rbxassetid://4483345998",
+    Time = 8
+})
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local Humanoid = LP.Character:FindFirstChildWhichIsA("Humanoid")
+local RootPart = LP.Character:FindFirstChild("HumanoidRootPart")
+local infjumpenabled = false
+
+local clientTab = Window:MakeTab({
+    Name = "CLIENT",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = clientTab:AddSection({
+    Name = "PLAYER"
+})
+
+setclipboard("")
+
+clientTab:AddSlider({
     Name = "WalkSpeed",
     Min = 16,
     Max = 200,
@@ -24,10 +56,10 @@ MainTab:AddSlider({
         if Humanoid then
             Humanoid.WalkSpeed = value
         end
-    end
+    end    
 })
 
-MainTab:AddSlider({
+clientTab:AddSlider({
     Name = "JumpPower",
     Min = 50,
     Max = 200,
@@ -40,182 +72,64 @@ MainTab:AddSlider({
         if Humanoid then
             Humanoid.JumpPower = value
         end
-    end
+    end    
 })
 
-MainTab:AddToggle({
-    Name = "Fly",
-    Default = false,
-    Callback = function(state)
-        getgenv().Flying = state
-        if getgenv().Flying then
-            StartFly()
-        else
-            EndFly()
-        end
-    end
-})
-
-MainTab:AddSlider({
-    Name = "Fly Speed",
-    Min = 20,
-    Max = 150,
-    Default = 50,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "FlySpeed",
-    Callback = function(value)
-        getgenv().FlySpeed = tonumber(value)
-    end
-})
-
-MainTab:AddButton({
-    Name = "Btools",
-    Callback = function()
-        if not LP.Backpack:FindFirstChildOfClass("HopperBin") then
-            for _, toolType in pairs({"Clone", "GameTool", "Hammer", "Script", "Grab"}) do
-                local tool = Instance.new("HopperBin", LP.Backpack)
-                tool.BinType = toolType
-            end
-        end
-    end
-})
-
-MainTab:AddButton({
-    Name = "Godmode",
-    Callback = function()
-        GodMode()
-    end
-})
-
-MainTab:AddButton({
-    Name = "Force Respawn",
+clientTab:AddButton({
+    Name = "RESPAWN!",
     Callback = function()
         LP.Character:BreakJoints()
         Humanoid.BreakJointsOnDeath = false
     end
 })
 
-MainTab:AddButton({
-    Name = "Get All Emotes",
+clientTab:AddToggle({
+    Name = "INFINITE JUMP",
+    Default = false,
+    Callback = function(value)
+        infjumpenabled = value
+        if infjumpenabled then
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Enabled",
+                Content = "INFINITE JUMP ENABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Infinite Jump Disabled",
+                Content = "INFINITE JUMP DISABLED",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
+})
+
+UserInputService.JumpRequest:Connect(function()
+    if infjumpenabled then
+        local humanoid = LP.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid:ChangeState("Jumping")
+        end
+    end
+end)
+
+clientTab:AddButton({
+    Name = "Godmode",
     Callback = function()
-        require(EmoteModule).GeneratePage(EmoteList, Emotes, 'Free Emotes')
+        GodMode()
     end
 })
 
-local EspTab = Window:MakeTab({
-        Name = "ESP",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
+local trollTab = Window:MakeTab({
+    Name = "TROLL",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
 })
 
-local Section = Tab:AddSection({
-        Name = "Esp"
-})
-
-EspTab:AddToggle({
-    Name = "Player ESP",
-    Default = false,
-    Callback = function(state)
-        getgenv().AllEsp = state
-        for _, v in pairs(folder:GetChildren()) do
-            if v:IsA("BillboardGui") and Players[v.Name] then
-                v.Enabled = getgenv().AllEsp
-            end
-        end
-    end
-})
-
-EspTab:AddToggle({
-    Name = "Murderer ESP",
-    Default = false,
-    Callback = function(state)
-        getgenv().MurderEsp = state
-        while getgenv().MurderEsp do
-            wait()
-            for _, v in pairs(folder:GetChildren()) do
-                if v:IsA("BillboardGui") and Players[v.Name] then
-                    if Players[v.Name].Character:FindFirstChild("Knife") or Players[v.Name].Backpack:FindFirstChild("Knife") then
-                        v.Enabled = getgenv().MurderEsp
-                    end
-                end
-            end
-        end
-    end
-})
-
-EspTab:AddToggle({
-    Name = "Sheriff ESP",
-    Default = false,
-    Callback = function(state)
-        getgenv().SheriffEsp = state
-        while getgenv().SheriffEsp do
-            wait()
-            for _, v in pairs(folder:GetChildren()) do
-                if v:IsA("BillboardGui") and Players[v.Name] then
-                    if Players[v.Name].Character:FindFirstChild("Gun") or Players[v.Name].Backpack:FindFirstChild("Gun") then
-                        v.Enabled = getgenv().SheriffEsp
-                    end
-                end
-            end
-        end
-    end
-})
-
-EspTab:AddToggle({
-    Name = "Xray",
-    Default = false,
-    Callback = function(state)
-        getgenv().Xray = state
-        if getgenv().Xray then
-            XrayOn(Workspace)
-        else
-            XrayOff(Workspace)
-        end
-    end
-})
-
-local TeleportTab = Window:MakeTab({
-        Name = "Teleport",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-})
-
-local Section = TeleportTab:AddSection({
-        Name = "Tp to place"
-})
-
-local TeleportTable = {"Lobby", "Map"}
-local TeleportDict = {
-    Lobby = Vector3.new(0, 0, 0),
-    Map = Vector3.new(100, 100, 100)
-}
-
-TeleportTab:AddDropdown({
-    Name = "Teleports",
-    Default = "Lobby",
-    Options = TeleportTable,
-    Callback = function(val)
-        if val == "Map" then
-            for _, child in pairs(Workspace:GetDescendants()) do
-                if child:IsA("BasePart") and child.Name == "Coin_Server" then
-                    RootPart.CFrame = CFrame.new(child.Parent.Parent.Map:FindFirstChild("Part").Position)
-                end
-            end
-        else
-            RootPart.CFrame = CFrame.new(TeleportDict[val])
-        end
-    end
-})
-
-local TargetTab = Window:MakeTab({
-        Name = "Target",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-})
-
-local Section = Tab:AddSection({
-        Name = "Target player"
+local Section = trollTab:AddSection({
+    Name = "TARGET"
 })
 
 local function updatePlayerList()
@@ -228,7 +142,8 @@ local function updatePlayerList()
     return playerList
 end
 
-local playerDropdown = TargetTab:AddDropdown({
+local selectedPlayer = nil
+local playerDropdown = trollTab:AddDropdown({
     Name = "Select Player",
     Options = updatePlayerList(),
     Callback = function(selected)
@@ -236,19 +151,15 @@ local playerDropdown = TargetTab:AddDropdown({
     end
 })
 
-local function refreshDropdown(dropdown)
-    dropdown:UpdateOptions(updatePlayerList())
-end
-
 Players.PlayerAdded:Connect(function()
-    refreshDropdown(playerDropdown)
+    playerDropdown:Refresh(updatePlayerList())
 end)
 
 Players.PlayerRemoving:Connect(function()
-    refreshDropdown(playerDropdown)
+    playerDropdown:Refresh(updatePlayerList())
 end)
 
-TargetTab:AddButton({
+trollTab:AddButton({
     Name = "Kill Player",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("Humanoid") then
@@ -260,7 +171,7 @@ TargetTab:AddButton({
     end
 })
 
-TargetTab:AddButton({
+trollTab:AddButton({
     Name = "Fling",
     Callback = function()
         if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -279,17 +190,149 @@ TargetTab:AddButton({
     end
 })
 
-local AutofarmTab = Window:MakeTab({
-        Name = "Autofarm",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
+local teleportTab = Window:MakeTab({
+    Name = "TELEPORT",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
 })
 
-local Section = AutofarmTab:AddSection({
-        Name = "Autofarm"
+local TeleportTable = {"Lobby", "Map"}
+local TeleportDict = {
+    Lobby = Vector3.new(0, 0, 0),
+    Map = Vector3.new(100, 100, 100)
+}
+
+teleportTab:AddDropdown({
+    Name = "Teleports",
+    Default = "Lobby",
+    Options = TeleportTable,
+    Callback = function(val)
+        if val == "Map" then
+            for _, child in pairs(Workspace:GetDescendants()) do
+                if child:IsA("BasePart") and child.Name == "Coin_Server" then
+                    RootPart.CFrame = CFrame.new(child.Parent.Parent.Map:FindFirstChild("Part").Position)
+                end
+            end
+        else
+            RootPart.CFrame = CFrame.new(TeleportDict[val])
+        end
+    end
 })
 
-AutofarmTab:AddToggle({
+teleportTab:AddButton({
+    Name = "Teleport",
+    Callback = function()
+        if selectedPlayer then
+            LP.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+            print("Teleported to " .. selectedPlayer.Name)
+        else
+            print("No player selected.")
+        end
+    end
+})
+
+local espTab = Window:MakeTab({
+    Name = "ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = espTab:AddSection({
+    Name = "ESP"
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ESPEnabled = false
+local roles
+
+-- > Functions < --
+
+function CreateHighlight()
+    for i, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and not v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = Instance.new("Highlight", v.Character)
+            highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Default color
+        end
+    end
+end
+
+function UpdateHighlights()
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LP and v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            local highlight = v.Character:FindFirstChildOfClass("Highlight")
+            if v.Name == Murder and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for Murderer
+            elseif v.Name == Sheriff and IsAlive(v) then
+                highlight.FillColor = Color3.fromRGB(0, 0, 255) -- Blue for Sheriff
+            elseif v.Name == Hero and IsAlive(v) and not IsAlive(game.Players[Sheriff]) then
+                highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow for Hero
+            else
+                highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green for others
+            end
+        end
+    end
+end    
+
+function IsAlive(player)
+    local playerData = roles[player.Name]
+    if playerData and not playerData.Killed and not playerData.Dead then
+        return true
+    end
+    return false
+end
+
+function StartESP()
+    ESPEnabled = true
+    CreateHighlight()
+    RunService.RenderStepped:Connect(function()
+        if ESPEnabled then
+            roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+            for i, v in pairs(roles) do
+                if v.Role == "Murderer" then
+                    Murder = i
+                elseif v.Role == 'Sheriff' then
+                    Sheriff = i
+                elseif v.Role == 'Hero' then
+                    Hero = i
+                end
+            end
+            UpdateHighlights()
+        end
+    end)
+end
+
+function StopESP()
+    ESPEnabled = false
+    for _, v in pairs(Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChildOfClass("Highlight") then
+            v.Character:FindFirstChildOfClass("Highlight"):Destroy()
+        end
+    end
+end
+
+espTab:AddToggle({
+    Name = "ESP PLAYER",
+    Default = false,
+    Callback = function(value)
+        if value then
+            StartESP()
+        else
+            StopESP()
+        end
+    end
+})
+
+local autofarmTab = Window:MakeTab({
+    Name = "AUTOFARM",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = autofarmTab:AddSection({
+    Name = "FARM"
+})
+
+autofarmTab:AddToggle({
     Name = "Autofarm",
     Default = false,
     Callback = function(state)
@@ -322,7 +365,26 @@ AutofarmTab:AddToggle({
     end
 })
 
-RolesTab:AddToggle({
+autofarmTab:AddDropdown({
+    Name = "Autofarm Method",
+    Default = "XP",
+    Options = {"XP", "Coins"},
+    Callback = function(val)
+        getgenv().AutofarmMethod = val
+    end
+})
+
+local rolesTab = Window:MakeTab({
+    Name = "ROLES",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = rolesTab:AddSection({
+    Name = "SHERIFF"
+})
+
+rolesTab:AddToggle({
     Name = "Silent Aim",
     Default = false,
     Callback = function(state)
@@ -330,7 +392,7 @@ RolesTab:AddToggle({
     end
 })
 
-RolesTab:AddSlider({
+rolesTab:AddSlider({
     Name = "Accuracy",
     Min = 0,
     Max = 100,
@@ -343,17 +405,7 @@ RolesTab:AddSlider({
     end
 })
 
-local RolesTab = Window:MakeTab({
-        Name = "Sheriff",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-})
-
-local Section = RolesTab:AddSection({
-        Name = "Roles"
-})
-
-RolesTab:AddToggle({
+rolesTab:AddToggle({
     Name = "Gun ESP",
     Default = false,
     Callback = function(state)
@@ -361,6 +413,7 @@ RolesTab:AddToggle({
     end
 })
 
+-- Auto-Shoot Features
 local isAutoShootEnabled = false
 local autoShootConnection
 
@@ -414,7 +467,7 @@ local function toggleAutoShoot(state)
     end
 end
 
-RolesTab:AddToggle({
+rolesTab:AddToggle({
     Name = "Auto-Shoot",
     Default = false,
     Callback = function(state)
